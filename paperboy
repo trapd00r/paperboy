@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+# paperboy
+use strict;
+
+my $database = './arbete';
+
+sub addRecord {
+  print "Distrikt: ";
+  chomp(my $district = <STDIN>);
+  print "Väntetid: ";
+  chomp(my $wait = <STDIN>);
+  print "Tidsåtgång: ";
+  chomp(my $time = <STDIN>);
+  print "Anteckningar: ";
+  chomp(my $notes = <STDIN>);
+  print "Övertid: ";
+  chomp(my $overtime = <STDIN>);
+  print "\n\n\n";
+  my @time = localtime(time);
+  my @months = qw(Januari
+                 Februari
+                 Mars
+                 April
+                 Maj
+                 Juni
+                 Juli
+                 Augusti
+                 September
+                 Oktober
+                 Novemer
+                 December
+                 );
+                  
+  my $date = sprintf("%02s:%02s:%02s %02s %s %s\n",
+    $time[2], $time[1], $time[0], 
+    $time[3], $months[$time[4]], $time[5]+=1900);
+  print "Datum $date";
+  print "Distrikt: $district\n";
+  print "Tidsåtgång: $time ($overtime övertid)\n";
+  print "Väntetid: $wait (".convWait($wait)." perioder)\n";
+  print "Anteckningar: $notes\n";
+
+}
+
+addRecord;
+sub convWait {
+  my $time = shift;
+  return $time/10;
+}
