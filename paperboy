@@ -2,7 +2,12 @@
 # paperboy
 use strict;
 
-my $database = './arbete';
+my $database = "$ENV{HOME}/.arbete";
+
+if(!-e $database) {
+  open(my $fh, '>', $database);
+  close $fh;
+}
 
 sub addRecord {
   print "Distrikt: ";
@@ -31,9 +36,9 @@ sub addRecord {
                  December
                  );
 
-  my $date = sprintf("%02s:%02s:%02s %02s %s %s\n",
+  chomp(my $date = sprintf("%02s:%02s:%02s %02s %s %s\n",
     $time[2], $time[1], $time[0], 
-    $time[3], $months[$time[4]], $time[5]+=1900);
+    $time[3], $months[$time[4]], $time[5]+=1900));
 
   my $fh;
   open($fh, '>>', $database) or die "Can not open $database: $!";
@@ -53,6 +58,10 @@ sub convWait {
   $time-=10;
   $time = $time/10; #
   use POSIX;
-  return ceil($time); # eller så kunde man skitit i $time-=10;
+  $time = ceil($time);
+  if($time < 1) {
+    return;
+  }
+  return $time;       # eller så kunde man skitit i $time-=10;
                       # och avrundat nedåt istället, men POSIX är kul
 }
