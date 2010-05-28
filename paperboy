@@ -15,7 +15,7 @@ sub addRecord {
   chomp(my $notes = <STDIN>);
   print "Övertid: ";
   chomp(my $overtime = <STDIN>);
-  print "\n\n\n";
+  print "\n";
   my @time = localtime(time);
   my @months = qw(Januari
                  Februari
@@ -30,20 +30,29 @@ sub addRecord {
                  Novemer
                  December
                  );
-                  
+
   my $date = sprintf("%02s:%02s:%02s %02s %s %s\n",
     $time[2], $time[1], $time[0], 
     $time[3], $months[$time[4]], $time[5]+=1900);
-  print "Datum $date";
-  print "Distrikt: $district\n";
-  print "Tidsåtgång: $time ($overtime övertid)\n";
-  print "Väntetid: $wait (".convWait($wait)." perioder)\n";
-  print "Anteckningar: $notes\n";
 
+  my $fh;
+  open($fh, '>>', $database) or die "Can not open $database: $!";
+  print $fh "Datum: $date\n";
+  print $fh "Distrikt: $district\n";
+  print $fh "Tidsåtgång: $time minuter\n";
+  print $fh "Väntetid: $wait minuter (@{[convWait($wait)]} perioder)\n" 
+    unless !$wait;
+  print $fh "Anteckningar: $notes\n"
+    unless !$notes;
+  print $fh "--\n";
 }
 
 addRecord;
 sub convWait {
   my $time = shift;
-  return $time/10;
+  $time-=10;
+  $time = $time/10; #
+  use POSIX;
+  return ceil($time); # eller så kunde man skitit i $time-=10;
+                      # och avrundat nedåt istället, men POSIX är kul
 }
